@@ -1,4 +1,5 @@
-from pyrogram import Client, filters
+import requests
+from pyrogram import Client
 
 # Your bot token and API credentials
 BOT_TOKEN = '6028376714:AAEc-lTbdg0HypAgdXg2Wz3vMeI5WvRjORA'
@@ -6,22 +7,34 @@ API_ID = '23830477'
 API_HASH = '19f8365d98fb11c9cd6c1eaa8b1fa4b8'
 CHANNEL_ID = -1001604178274  # Replace with your channel ID (a negative integer)
 
-# List of user IDs to remove from the channel
-users_to_remove = [123, 456, 789]  # Replace with the user IDs you want to remove
-
 # Initialize the Pyrogram client
 app = Client('my_bot', bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API_HASH)
 
-# Function to remove specific members from the channel
-async def remove_specific_members(client, chat_id):
+# Function to remove all members from the channel using the Telegram Bot API
+def remove_all_members():
     try:
-        for user_id in users_to_remove:
-            await client.kick_chat_member(chat_id, user_id)
-            print(f"Kicked user with ID: {user_id}")
+        bot_token = 'YOUR_BOT_TOKEN'  # Replace with your bot's token
+        chat_id = CHANNEL_ID
+
+        # Use the Bot API to get chat members
+        url = f"https://api.telegram.org/bot{bot_token}/getChatMembers?chat_id={chat_id}"
+        response = requests.get(url)
+        data = response.json()
+        members = data['result']
+
+        for member in members:
+            user_id = member['user']['id']
+            user_name = member['user']['first_name']
+            
+            # Kick the user using the Bot API
+            kick_url = f"https://api.telegram.org/bot{bot_token}/kickChatMember?chat_id={chat_id}&user_id={user_id}"
+            kick_response = requests.get(kick_url)
+            print(f"Kicked user: {user_name} (ID: {user_id})")
+
     except Exception as e:
         print(f"Error removing members: {e}")
 
 if __name__ == "__main__":
     app.start()
-    app.loop.run_until_complete(remove_specific_members(app, CHANNEL_ID))
+    remove_all_members()
     app.stop()
