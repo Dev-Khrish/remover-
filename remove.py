@@ -12,12 +12,13 @@ app = Client('my_bot', bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API_HASH)
 # Function to remove all members from the channel
 async def remove_all_members(client, chat_id):
     try:
-        async with app.with_chats([chat_id]):
-            chat_members = await client.iter_chat_members(chat_id)
-            for member in chat_members:
-                if member.status not in ["creator", "administrator"]:
-                    await client.kick_chat_member(chat_id, member.user.id)
-                    print(f"Kicked user: {member.user.username}")
+        chat_members = await client.get_chat_members(chat_id)
+        for member in chat_members:
+            if member.status not in ["creator", "administrator"]:
+                user_id = member.user.id
+                user_name = member.user.first_name
+                await client.kick_chat_member(chat_id, user_id)
+                print(f"Kicked user: {user_name} (ID: {user_id})")
     except Exception as e:
         print(f"Error removing members: {e}")
 
