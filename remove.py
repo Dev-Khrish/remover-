@@ -1,4 +1,4 @@
-from pyrogram import Client, filters
+from pyrogram import Client
 
 # Your bot token and API credentials
 BOT_TOKEN = '6028376714:AAEc-lTbdg0HypAgdXg2Wz3vMeI5WvRjORA'
@@ -12,8 +12,7 @@ app = Client('my_bot', bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API_HASH)
 # Function to remove all members from the channel
 async def remove_all_members(client, chat_id):
     try:
-        chat_members = await client.get_chat_members(chat_id)
-        for member in chat_members:
+        async for member in client.iter_chat_members(chat_id):
             if member.status not in ["creator", "administrator"]:
                 user_id = member.user.id
                 user_name = member.user.first_name
